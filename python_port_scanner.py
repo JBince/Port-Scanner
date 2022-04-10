@@ -11,17 +11,20 @@ req_args = parser.add_argument_group('Required named args')
 req_args.add_argument('-t', '--target', help='Target IP Address')
 req_args.add_argument(
     '-p', '--ports', help='Port specification. Should be a range (x-y), a single port (x), or "all" for a full 65,535 port scan')
-parser.add_argument('-b','--banner',help='Grab banners from ports',action='store_true')
+parser.add_argument(
+    '-b', '--banner', help='Grab banners from ports', action='store_true')
 args = parser.parse_args()
 
 open_ports = []
+
+
 def scan():
-    t1 = Target(args.target,args.ports)
+    t1 = Target(args.target, args.ports)
     scan_type = t1.determine_type()
     try:
         target = socket.gethostbyname(args.target)
         # Establish if the selection is all, a single port, or a range of ports
-        #For all ports
+        # For all ports
         if scan_type == 'all':
             for p in range(1, 65535):
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -33,7 +36,7 @@ def scan():
                     open_ports.append(p)
                 sock.close()
 
-        #For a single port
+        # For a single port
         elif scan_type == 'single_port':
             port = int(args.ports)
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -47,7 +50,7 @@ def scan():
                 print(f'{port} is closed')
             sock.close()
 
-        #For a port range
+        # For a port range
         elif scan_type == 'port_range':
             start = int(args.ports.split('-')[0])
             end = int(args.ports.split('-')[1])
@@ -65,20 +68,21 @@ def scan():
     finally:
         pass
 
+
 def grab_banner():
     for p in open_ports:
         try:
-            s= socket.socket()
-            s.connect((args.target,int(p)))
+            s = socket.socket()
+            s.connect((args.target, int(p)))
             banner = s.recv(1024).decode('utf-8')
             print(f'Port {p}: {banner}')
             s.close()
         except:
             print(f'Could not get banner for port {p}')
 
+
 def main():
     try:
-        print(args.ports)
         scan()
         grab_banner()
     except KeyboardInterrupt:
@@ -90,5 +94,6 @@ def main():
     except socket.error:
         print("\n[*] Server not responding")
         sys.exit()
+
 
 main()
