@@ -84,7 +84,8 @@ def grab_banner():
 def main():
     try:
         scan()
-        grab_banner()
+        if args.banner:
+            grab_banner()
     except KeyboardInterrupt:
         print('\n[*] Exiting')
         sys.exit()
